@@ -286,9 +286,16 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     suspend fun dosesFor(date: String): List<DoseSlot> {
-        val meds = container.medicationRepository.getActive()
+        // 补记过去某一天时列出全部药物（含已停用、起止日期之外的），
+        // 让「先吃药、后补录药物资料」的场景也能补全历史剂量。
+        val historical = date < DateUtils.todayIso()
+        val meds = if (historical) {
+            container.medicationRepository.getAll()
+        } else {
+            container.medicationRepository.getActive()
+        }
         val logs = container.medicationRepository.getAllLogs().filter { it.date == date }
-        return container.medicationRepository.dosesFor(date, meds, logs)
+        return container.medicationRepository.dosesFor(date, meds, logs, historical)
     }
 
     suspend fun adherenceFor(days: Int): AdherenceSummary {
@@ -296,8 +303,16 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         return container.medicationRepository.adherence(start, end)
     }
 
-    suspend fun submitScale(type: String, answers: List<Int>): ScaleAssessmentEntity {
-        return container.scaleRepository.save(type, answers)
+    /** 测评也可以补记到过去的某一天；不允许未来日期。 */
+    suspend fun submitScale(
+        type: String,
+        answers: List<Int>,
+        dateIso: String = DateUtils.todayIso()
+    ): ScaleAssessmentEntity {
+        val today = DateUtils.todayIso()
+        val safeDate = if (dateIso <= today) dateIso else today
+        val recordedAt = DateUtils.timestampOf(safeDate, DateUtils.nowTimeLabel())
+        return container.scaleRepository.save(type, answers, recordedAt)
     }
 
     fun deleteScale(id: Long) {

@@ -80,31 +80,37 @@ fun CalendarCard(
     val selectedCheckIn = checkInMap[selectedIso]
     val selectedJournal = journalByDate[selectedIso].orEmpty()
 
+    // 翻月时同步把选中日期带到新月份，避免「看着 10 月的日历，点补记却写进今天」。
+    // 未来月份不可进入，未来日期在日历里也始终是禁用的。
+    fun shiftMonth(delta: Int) {
+        var y = year
+        var m = month + delta
+        if (m < 1) { y -= 1; m = 12 }
+        if (m > 12) { y += 1; m = 1 }
+        year = y
+        month = m
+        val day = minOf(selectedDate.dayOfMonth, DateUtils.monthLength(y, m))
+        val candidate = LocalDate.of(y, m, day)
+        selectedIso = DateUtils.iso(if (candidate.isAfter(today)) today else candidate)
+    }
+    val canGoNext = LocalDate.of(year, month, 1)
+        .isBefore(LocalDate.of(today.year, today.monthValue, 1))
+
     Column(modifier = Modifier.fillMaxWidth()) {
     SoftCard {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = {
-                if (month == 1) {
-                    year -= 1
-                    month = 12
-                } else {
-                    month -= 1
-                }
-            }) { Icon(Icons.Rounded.ChevronLeft, contentDescription = "上个月") }
+            IconButton(onClick = { shiftMonth(-1) }) {
+                Icon(Icons.Rounded.ChevronLeft, contentDescription = "上个月")
+            }
             Text(
                 DateUtils.monthLabel(year, month),
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.weight(1f),
                 textAlign = androidx.compose.ui.text.style.TextAlign.Center
             )
-            IconButton(onClick = {
-                if (month == 12) {
-                    year += 1
-                    month = 1
-                } else {
-                    month += 1
-                }
-            }) { Icon(Icons.Rounded.ChevronRight, contentDescription = "下个月") }
+            IconButton(onClick = { shiftMonth(1) }, enabled = canGoNext) {
+                Icon(Icons.Rounded.ChevronRight, contentDescription = "下个月")
+            }
         }
         Spacer(Modifier.height(8.dp))
         Row(modifier = Modifier.fillMaxWidth()) {

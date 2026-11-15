@@ -495,7 +495,11 @@ fun CheckInScreen(
                     .padding(horizontal = 20.dp, vertical = 10.dp)
             ) {
                 PrimaryActionButton(
-                    text = if (existing == null) "保存今天的记录" else "更新记录",
+                    text = when {
+                        existing != null -> "更新记录"
+                        date == DateUtils.todayIso() -> "保存今天的记录"
+                        else -> "保存补记"
+                    },
                     enabled = hasAny,
                     onClick = { save() }
                 )

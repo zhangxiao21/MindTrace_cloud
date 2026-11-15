@@ -30,10 +30,22 @@
 - 主题色与深浅模式从设置页内联的三组控件收敛为「单一数据源 + 一个切换面板」，避免同一功能两套控件。
 - 同步更新关于页、隐私说明页、首次引导、README、PRIVACY、USER_GUIDE、TESTING 中关于「不申请网络权限 / 完全离线」的旧表述。
 
+### 补记能力核查与修正（0.4.2 后续提交）
+
+逐类检查「过去任意一天的信息能否补全」，并修掉发现的缺口：
+
+- **打卡（心情 / 睡眠等）**：确认打卡页对任意过去日期可写全部字段（情绪、焦虑、易怒、精力、睡眠时长与质量、食欲、注意力、症状与强度、诱因、自伤念头、用药与副作用、备注）；`check_ins.date` 有唯一索引，仓库 `save()` 会先按日期取已有 id 再 upsert，不会补出重复行。补记时按钮由「保存今天的记录」改为「保存补记」。
+- **服药**：修复补记页按 `active` + `startDate/endDate` 过滤导致「先吃药、后补录药物资料」时历史剂量列不出来的问题。新增 `selectDoseMedications()`：历史日期列出全部定时药物（含已停用 / 起止日期之外），今天仍按原规则；按需药物补记也不再受在服状态限制。只有主动点击才写入。
+- **量表**：原来 `ScaleAssessmentEntity` 只有 `createdAt`、结果只能算作今天。现在最后一题增加「记录日期」选择器，可补记到过去任意一天；用 `createdAt` 承载所选日期时间（趋势、最近测评、复诊报告本来就按 `createdAt` 取日期），**不需要改数据库 schema**。
+- **日记**：确认 `JournalEditScreen` 的日期可改、支持过去日期。
+- **日历翻月**：修复翻到过去月份后仍默认选中今天、点「补记」会写进今天的问题；翻月自动选中新月份对应日期，并禁用进入未来月份。
+- **未来日期防线**：打卡、日记仓库层补充未来日期拒绝（与服药补记一致），量表在 ViewModel 兜底回退到今天。
+- 新增 `BackfillTest`（4 项：历史药物筛选、非法日期、量表补记时间戳、未来日期判定），中英文文案同步。
+
 ### 构建
 
 - versionCode 17 / versionName 0.4.2
-- 用本机 Gradle 8.9 + Android SDK（`/d/Programes/android-sdk`）离线完成 `:app:compileDebugKotlin` 与 `:app:testDebugUnitTest` 校验。
+- 用本机 Gradle 8.9 + Android SDK（`/d/Programes/android-sdk`）离线完成 `:app:assembleDebug` 与 `:app:testDebugUnitTest` 校验。
 
 ## 0.4.1 — 2026-11-13
 

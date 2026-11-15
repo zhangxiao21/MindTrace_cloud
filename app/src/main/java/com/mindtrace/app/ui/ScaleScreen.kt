@@ -40,8 +40,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.mindtrace.app.data.DateUtils
 import com.mindtrace.app.data.ScaleAssessmentEntity
 import com.mindtrace.app.data.ScaleCatalog
+import com.mindtrace.app.ui.components.DateField
 import com.mindtrace.app.ui.components.InfoBanner
 import com.mindtrace.app.ui.components.PrimaryActionButton
 import com.mindtrace.app.ui.components.ScreenHeader
@@ -74,6 +76,8 @@ fun ScaleScreen(
     var answers by remember(type) { mutableStateOf(List(def.questions.size) { -1 }) }
     var result by remember(type) { mutableStateOf<ScaleAssessmentEntity?>(null) }
     var submitting by remember(type) { mutableStateOf(false) }
+    // 测评日期：默认今天，可补记到过去任意一天；DateField 本身禁用未来日期。
+    var recordDate by remember(type) { mutableStateOf(DateUtils.todayIso()) }
 
     val currentAnswer = answers.getOrElse(index) { -1 }
     val isLast = index == def.questions.lastIndex
@@ -82,7 +86,7 @@ fun ScaleScreen(
         if (answers.any { it < 0 } || submitting) return
         submitting = true
         scope.launch {
-            result = viewModel.submitScale(def.type, answers)
+            result = viewModel.submitScale(def.type, answers, recordDate)
             submitting = false
         }
     }
@@ -190,6 +194,23 @@ fun ScaleScreen(
                                 }
                             }
                         }
+                        if (isLast) {
+                            item {
+                                SoftCard {
+                                    DateField(
+                                        label = "记录日期",
+                                        isoDate = recordDate,
+                                        onDateChange = { recordDate = it }
+                                    )
+                                    Spacer(Modifier.height(6.dp))
+                                    Text(
+                                        "可补记过去的测评日期，不能选择未来；结果会归到所选那天。",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            }
+                        }
                         item { Spacer(Modifier.height(10.dp)) }
                     }
                 }
@@ -231,6 +252,7 @@ fun ScaleScreen(
                         result = null
                         index = 0
                         answers = List(def.questions.size) { -1 }
+                        recordDate = DateUtils.todayIso()
                     },
                     onOpenCrisis = onOpenCrisis
                 )

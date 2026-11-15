@@ -111,6 +111,10 @@ class CheckInRepository(private val dao: CheckInDao) {
     suspend fun getAll(): List<CheckInEntity> = dao.getAll()
 
     suspend fun save(entity: CheckInEntity): Long {
+        // 补记只允许今天及过去。UI 的日历已禁用未来日期，这里做仓库层兜底，
+        // 避免通过外部 Intent 传入的日期写入未来记录。
+        val target = DateUtils.parse(entity.date) ?: return -1L
+        if (target.isAfter(DateUtils.today())) return -1L
         val existing = dao.getByDate(entity.date)
         val now = System.currentTimeMillis()
         return dao.upsert(
@@ -142,6 +146,30 @@ data class DoseSlot(
     val status: DoseStatus,
     val log: MedicationLogEntity? = null
 )
+
+/**
+ * 选择某一天需要展示的定时用药。
+ *
+ * - 今天：只显示在服、且落在起止日期内的药物（首页与药物页的常规打卡）。
+ * - 补记过去：列出全部药物，包含已停用、以及开始日期晚于那天 / 结束日期早于那天的
+ *   药物。用户常常是先吃了几天药才想起来把药加进应用，如果按起止日期过滤，
+ *   过去的剂量就永远补不回来；这里放宽限制，但只有用户主动点「标记已服」才会写入。
+ */
+fun selectDoseMedications(
+    dateIso: String,
+    medications: List<MedicationEntity>,
+    historical: Boolean
+): List<MedicationEntity> {
+    if (DateUtils.parse(dateIso) == null) return emptyList()
+    return medications.filter { med ->
+        if (historical) {
+            true
+        } else {
+            med.active && med.startDate <= dateIso &&
+                (med.endDate == null || med.endDate >= dateIso)
+        }
+    }.filter { !it.asNeeded }
+}
 
 /** 解析 "symptomId:0-10" 形式的症状强度。 */
 fun parseSymptomSeverity(raw: String): Map<String, Int> =
@@ -263,13 +291,16 @@ class MedicationRepository(
         logDao.upsert(entity)
     }
 
-    suspend fun dosesFor(date: String, medications: List<MedicationEntity>, logs: List<MedicationLogEntity>): List<DoseSlot> {
+    suspend fun dosesFor(
+        date: String,
+        medications: List<MedicationEntity>,
+        logs: List<MedicationLogEntity>,
+        historical: Boolean = false
+    ): List<DoseSlot> {
         val target = DateUtils.parse(date) ?: return emptyList()
         val today = DateUtils.today()
         val logKey = logs.associateBy { it.medicationId to it.time }
-        return medications
-            .filter { it.active && it.startDate <= date && (it.endDate == null || it.endDate >= date) }
-            .filter { !it.asNeeded }
+        return selectDoseMedications(date, medications, historical)
             .flatMap { med ->
                 med.times.split(',').filter { it.isNotBlank() }.map { time ->
                     val log = logKey[med.id to time]
@@ -346,7 +377,16 @@ class ScaleRepository(private val dao: ScaleDao) {
     fun observeByType(type: String): Flow<List<ScaleAssessmentEntity>> = dao.observeByType(type)
     suspend fun getAll(): List<ScaleAssessmentEntity> = dao.getAll()
 
-    suspend fun save(type: String, answers: List<Int>): ScaleAssessmentEntity {
+    /**
+     * 保存一次测评。`recordedAt` 是这次测评所属的日期（可补记过去），
+     * 沿用实体里已有的时间戳字段，不需要改数据库 schema；趋势、复诊报告与
+     * 「最近测评」本来就按 createdAt 显示日期，因此补记结果会自动落在那一天。
+     */
+    suspend fun save(
+        type: String,
+        answers: List<Int>,
+        recordedAt: Long = System.currentTimeMillis()
+    ): ScaleAssessmentEntity {
         val def = requireNotNull(ScaleCatalog.byType(type)) { "Unknown scale $type" }
         val score = def.score(answers)
         val band = def.severity(answers)
@@ -355,7 +395,7 @@ class ScaleRepository(private val dao: ScaleDao) {
             answers = answers.joinToString(","),
             score = score,
             severity = band.key,
-            createdAt = System.currentTimeMillis()
+            createdAt = recordedAt.coerceAtMost(System.currentTimeMillis())
         )
         dao.insert(entity)
         return entity
@@ -373,6 +413,9 @@ class JournalRepository(private val dao: JournalDao) {
     suspend fun get(id: Long): JournalEntryEntity? = dao.getById(id)
     suspend fun getAll(): List<JournalEntryEntity> = dao.getAll()
     suspend fun save(entry: JournalEntryEntity): Long {
+        // 日记同样只允许写到今天或过去，与打卡、服药补记保持一致。
+        val target = DateUtils.parse(entry.date) ?: return -1L
+        if (target.isAfter(DateUtils.today())) return -1L
         val now = System.currentTimeMillis()
         return dao.upsert(
             entry.copy(

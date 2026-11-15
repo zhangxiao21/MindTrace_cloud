@@ -79,7 +79,8 @@ fun MedicationBackfillScreen(
         doses = viewModel.dosesFor(date)
     }
 
-    val asNeeded = medications.filter { it.active && it.asNeeded }
+    // 补记页列出全部按需药物（含已停用），方便补全过去任意一天的记录。
+    val asNeeded = medications.filter { it.asNeeded }
     val medNames = medications.associate { it.id to it.displayLabel() }
     val takenCount = doses.count { it.status == DoseStatus.TAKEN }
     val sortedLogs = logs.sortedWith(
@@ -150,6 +151,12 @@ fun MedicationBackfillScreen(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
+            }
+
+            item {
+                InfoBanner(
+                    text = "补记会列出全部药物（包括已停用、以及开始日期晚于这一天的药物），方便补全过去记录。只有你主动点「标记已服」或「补一次」才会写入。"
+                )
             }
 
             item {

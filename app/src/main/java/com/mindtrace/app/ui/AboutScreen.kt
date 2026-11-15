@@ -29,10 +29,7 @@ import com.mindtrace.app.ui.components.SoftCard
 @Composable
 fun AboutScreen(
     onBack: () -> Unit,
-    onOpenPrivacy: () -> Unit,
-    onOpenSafety: () -> Unit,
-    onOpenTerms: () -> Unit,
-    onOpenSupport: () -> Unit
+    onOpenSafety: () -> Unit
 ) {
     LazyColumn(
         modifier = Modifier
@@ -70,7 +67,7 @@ fun AboutScreen(
                 SectionTitle("这是什么")
                 Spacer(Modifier.height(6.dp))
                 Text(
-                    "心迹是一款完全离线的自我记录工具，帮助你记录情绪、睡眠、症状、用药和自评量表，" +
+                    "心迹是一款本地优先的自我记录工具，帮助你记录情绪、睡眠、症状、用药和自评量表，" +
                         "并在复诊时生成一份便于沟通的报告。它不催促、不评分，也不把记录变成任务。",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -86,15 +83,16 @@ fun AboutScreen(
             SoftCard {
                 SectionTitle("数据边界")
                 Spacer(Modifier.height(6.dp))
-                Bullet("应用不申请 INTERNET 权限，无法主动把数据发送出去。")
+                Bullet("默认完全不联网；只有在云备份页手动上传或下载时才会使用网络。")
+                Bullet("上传的始终是加密后的 .mtrbackup，密码不会被保存；连接凭据只存在本机。")
                 Bullet("数据库使用 SQLCipher 整体加密，密钥由 Android Keystore 保管。")
-                Bullet("无账号、无广告、无统计 SDK、无云备份。")
+                Bullet("无账号、无广告、无统计 SDK、无自动云同步。")
                 Bullet("报告、CSV 与备份只在你自己选择的位置生成。")
                 Bullet("卸载、清除数据或删除全部数据会销毁密钥，数据无法恢复；请在更换手机或卸载前导出加密备份。")
                 Bullet("更新时直接覆盖安装，不要先卸载；卸载会丢失数据。")
                 Spacer(Modifier.height(6.dp))
                 Text(
-                    "权限说明：通知与精确提醒用于本地提醒；生物识别仅用于解锁，指纹/面容数据由系统处理；开机启动用于恢复提醒。应用不申请网络权限。",
+                    "权限说明：通知与精确提醒用于本地提醒；生物识别仅用于解锁，指纹/面容数据由系统处理；开机启动用于恢复提醒。网络权限仅用于手动云备份，应用本身没有服务器。",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -105,7 +103,7 @@ fun AboutScreen(
                 SectionTitle("量表与来源")
                 Spacer(Modifier.height(6.dp))
                 Text(
-                    "心迹内置 24 个自评/筛查量表，包括 PHQ-9、GAD-7、PCL-5、WHO-5 等。部分量表可免费用于临床与研究；部分量表受版权保护，电子版再分发前请确认授权。具体来源见 NOTICE.md。所有量表仅用于筛查和追踪，不是诊断。",
+                    "心迹内置 28 个自评/筛查量表，包括 PHQ-9、GAD-7、PCL-5、WHO-5、K6、PSS-10、AUDIT、UCLA-3 等。新增量表均取自权威机构公开资料并在 NOTICE.md 中列出来源。部分量表受版权保护，电子版再分发前请确认授权。所有量表仅用于筛查和追踪，不是诊断。",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -131,27 +129,8 @@ fun AboutScreen(
                 }
             }
         }
-        item {
-            SoftCard {
-                SectionTitle("说明与支持")
-                Spacer(Modifier.height(4.dp))
-                TextButton(
-                    onClick = onOpenPrivacy,
-                    modifier = Modifier.fillMaxWidth(),
-                    contentPadding = PaddingValues(0.dp)
-                ) { Text("隐私说明") }
-                TextButton(
-                    onClick = onOpenTerms,
-                    modifier = Modifier.fillMaxWidth(),
-                    contentPadding = PaddingValues(0.dp)
-                ) { Text("使用条款与医疗边界") }
-                TextButton(
-                    onClick = onOpenSupport,
-                    modifier = Modifier.fillMaxWidth(),
-                    contentPadding = PaddingValues(0.dp)
-                ) { Text("问题反馈与诊断信息") }
-            }
-        }
+        // 「隐私说明 / 使用条款 / 问题反馈」已统一放在设置页，这里不再重复放一组相同入口。
+        // 关于页只保留独有的安全计划入口与版本、来源说明。
         item {
             Text(
                 "心迹 · 本地优先 · MIT License\n记录属于你，也只属于你。",

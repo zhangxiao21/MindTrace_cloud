@@ -66,7 +66,42 @@ class ScaleCatalogTest {
         assertEquals(21, ScaleCatalog.dass21.questions.size)
         assertEquals(19, ScaleCatalog.psqi.questions.size)
         assertEquals(21, ScaleCatalog.psqi.maxScore)
-        assertEquals(24, ScaleCatalog.all.size)
+        assertEquals(28, ScaleCatalog.all.size)
+    }
+
+    @Test
+    fun scales_added_in_042_match_their_published_scoring() {
+        assertEquals(6, ScaleCatalog.k6.questions.size)
+        assertEquals(24, ScaleCatalog.k6.maxScore)
+        assertEquals(24, ScaleCatalog.k6.score(List(6) { 0 }))
+        assertEquals(0, ScaleCatalog.k6.score(List(6) { 4 }))
+        assertEquals("high", ScaleCatalog.k6.severity(13).key)
+
+        assertEquals(10, ScaleCatalog.pss10.questions.size)
+        assertEquals(40, ScaleCatalog.pss10.maxScore)
+        assertEquals("moderate", ScaleCatalog.pss10.severity(14).key)
+
+        assertEquals(10, ScaleCatalog.audit.questions.size)
+        assertEquals(40, ScaleCatalog.audit.maxScore)
+        assertEquals("dependence", ScaleCatalog.audit.severity(20).key)
+
+        assertEquals(3, ScaleCatalog.ucla3.questions.size)
+        assertEquals(9, ScaleCatalog.ucla3.maxScore)
+        assertEquals(3, ScaleCatalog.ucla3.score(List(3) { 0 }))
+        assertEquals(9, ScaleCatalog.ucla3.score(List(3) { 2 }))
+        assertEquals("high", ScaleCatalog.ucla3.severity(6).key)
+    }
+
+    @Test
+    fun every_scale_has_a_verifiable_source_and_complete_bands() {
+        ScaleCatalog.all.forEach { scale ->
+            assertTrue("${scale.type} 缺少来源说明", scale.source.isNotBlank())
+            assertTrue("${scale.type} 缺少分级", scale.bands.isNotEmpty())
+            assertTrue("${scale.type} 分级未覆盖满分", scale.bands.last().max >= scale.maxScore)
+            assertTrue("${scale.type} 存在空题目", scale.questions.all { it.options.isNotEmpty() })
+        }
+        listOf(ScaleCatalog.k6, ScaleCatalog.pss10, ScaleCatalog.audit, ScaleCatalog.ucla3)
+            .forEach { assertTrue("${it.type} 缺少公开来源网址", it.source.contains("https://")) }
     }
 
     @Test

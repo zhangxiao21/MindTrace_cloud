@@ -193,6 +193,23 @@ class SettingsStore(context: Context) {
             .apply()
     }
 
+    /**
+     * 恢复备份里保存的界面设置。
+     * 只接受白名单内的值，避免旧/损坏备份写入非法配置。
+     * PIN、应用锁、提醒开关与云凭据不在这里恢复。
+     */
+    fun applyRestored(settings: BackupSettings) {
+        language = settings.language.takeIf { it in listOf("system", "zh", "en") } ?: "system"
+        themeMode = settings.themeMode.takeIf { it in listOf("system", "light", "dark") } ?: "system"
+        themeColor = settings.themeColor.takeIf {
+            it in listOf("sage", "ocean", "plum", "amber", "rose")
+        } ?: "sage"
+        crisisCountry = settings.crisisCountry.take(8)
+        medicationOrder = settings.medicationOrder
+        defaultReportDays = settings.defaultReportDays.coerceIn(7, 365)
+        stealthNotifications = settings.stealthNotifications
+    }
+
     fun reset() {
         // 必须同步写入：删除全部数据后会立即结束进程，apply() 的异步落盘可能丢失。
         sp.edit().clear().commit()

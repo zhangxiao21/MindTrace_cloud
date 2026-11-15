@@ -322,7 +322,7 @@ private fun WelcomePage(
         }
         item {
             SoftCard {
-                FeatureLine(Icons.Rounded.WifiOff, "完全离线", "不申请网络权限，数据不会离开这台手机。")
+                FeatureLine(Icons.Rounded.WifiOff, "默认离线", "不会主动联网；只有你手动开启云备份时才会传输加密备份。")
                 Spacer(Modifier.height(14.dp))
                 FeatureLine(Icons.Rounded.Shield, "加密保存", "数据库整体加密，密钥由系统安全区保管。")
                 Spacer(Modifier.height(14.dp))

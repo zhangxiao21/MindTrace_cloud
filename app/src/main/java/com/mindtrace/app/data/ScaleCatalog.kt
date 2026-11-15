@@ -1374,6 +1374,208 @@ object ScaleCatalog {
         noteEn = "The AQ-10 is not a diagnostic tool for autism."
     )
 
+    // ---------- 0.4.2 新增：来自权威公开来源的自评量表 ----------
+
+    /** K6 / CDC 的 0–4 频率选项（"所有时间" = 4）。 */
+    private val k6Freq = listOf(
+        o("所有时间", "All of the time", 4),
+        o("大部分时间", "Most of the time", 3),
+        o("有些时候", "Some of the time", 2),
+        o("很少时间", "A little of the time", 1),
+        o("从来没有", "None of the time", 0)
+    )
+
+    /** PSS-10 的 0–4 频率选项与反向计分选项。 */
+    private val pssFreq = listOf(
+        o("从不", "Never", 0),
+        o("几乎从不", "Almost never", 1),
+        o("有时", "Sometimes", 2),
+        o("相当经常", "Fairly often", 3),
+        o("非常经常", "Very often", 4)
+    )
+    private val pssFreqReversed = listOf(
+        o("从不", "Never", 4),
+        o("几乎从不", "Almost never", 3),
+        o("有时", "Sometimes", 2),
+        o("相当经常", "Fairly often", 1),
+        o("非常经常", "Very often", 0)
+    )
+
+    /** AUDIT 题目 1–8 的 0–4 频率选项。 */
+    private val auditFreq = listOf(
+        o("从不", "Never", 0),
+        o("少于每月一次", "Less than monthly", 1),
+        o("每月一次", "Monthly", 2),
+        o("每周一次", "Weekly", 3),
+        o("每天或几乎每天", "Daily or almost daily", 4)
+    )
+
+    /** AUDIT 题目 9–10 的 0 / 2 / 4 选项。 */
+    private val auditYesNo = listOf(
+        o("没有", "No", 0),
+        o("有，但不是在过去一年", "Yes, but not in the last year", 2),
+        o("有，就在过去一年", "Yes, during the last year", 4)
+    )
+
+    private val ucla3Freq = listOf(
+        o("几乎没有", "Hardly ever", 1),
+        o("有些时候", "Some of the time", 2),
+        o("经常", "Often", 3)
+    )
+
+    val k6 = ScaleDef(
+        type = "K6",
+        name = "心理困扰量表（K6）",
+        nameEn = "Kessler Psychological Distress Scale (K6)",
+        shortName = "K6",
+        category = "抑郁与焦虑",
+        categoryEn = "Depression & anxiety",
+        description = "6 项非特异性心理困扰筛查，适用于过去 30 天。",
+        descriptionEn = "A 6-item screen for non-specific psychological distress over the past 30 days.",
+        timeframe = "过去 30 天",
+        timeframeEn = "Over the past 30 days",
+        instruction = "在过去 30 天里，你有多经常出现以下感受？请按第一直觉作答。",
+        instructionEn = "During the past 30 days, how often did you feel the following? Answer with your first instinct.",
+        questions = listOf(
+            q("感到紧张", "Nervous", k6Freq),
+            q("感到绝望", "Hopeless", k6Freq),
+            q("感到坐立不安或烦躁", "Restless or fidgety", k6Freq),
+            q("心情低落、沮丧到什么都无法让你高兴起来", "So sad or depressed that nothing could cheer you up", k6Freq),
+            q("觉得做任何事都很费力", "That everything was an effort", k6Freq),
+            q("觉得自己没有价值、很没用", "Down on yourself, no good or worthless", k6Freq)
+        ),
+        bands = listOf(
+            b(0, 4, "low", "困扰较轻", "Low distress", "目前的心理困扰较轻。继续保持规律的记录、睡眠与支持。", "Your current distress appears low. Keep up regular tracking, sleep and support."),
+            b(5, 12, "moderate", "中等困扰", "Moderate distress", "有一些心理困扰信号。可以留意睡眠、活动量与压力来源，必要时与信任的人或专业人员聊聊。", "There are some signs of distress. Pay attention to sleep, activity and stressors, and talk with someone you trust or a professional if needed."),
+            b(13, 24, "high", "较高困扰", "High distress", "得分达到 CDC / NCHS 用于判定「严重心理困扰」的常用界值（13 分）。建议尽快寻求专业评估；如果出现伤害自己的念头，请立即联系急救或危机热线。", "Your score reaches the CDC / NCHS cut-off of 13 commonly used to define serious psychological distress. Consider contacting a professional soon; if you have thoughts of harming yourself, contact emergency services or a crisis line immediately.")
+        ),
+        estimatedMinutes = 1,
+        featured = false,
+        source = "Kessler-6 (K6): Kessler 等 (2002)；美国 CDC / NCHS 与 SAMHSA 用于严重心理困扰筛查。官方条目、计分与 ≥13 界值：https://www.cdc.gov/nchs/products/databriefs/db203.htm · https://www.cdc.gov/dhdsp/health_equity/psychosocial.htm · https://www.hcp.med.harvard.edu/ncs/k6_scales.php",
+        sourceEn = "Kessler-6 (K6): Kessler et al. (2002); used by CDC / NCHS and SAMHSA to screen serious psychological distress. Official items, scoring and the >=13 cut-off: https://www.cdc.gov/nchs/products/databriefs/db203.htm · https://www.cdc.gov/dhdsp/health_equity/psychosocial.htm · https://www.hcp.med.harvard.edu/ncs/k6_scales.php",
+        note = "K6 测量的是非特异性心理困扰，不是抑郁或焦虑的诊断；不同研究的界值可能略有差异。",
+        noteEn = "The K6 measures non-specific psychological distress, not a diagnosis of depression or anxiety; cut-offs vary slightly between studies."
+    )
+
+    val pss10 = ScaleDef(
+        type = "PSS10",
+        name = "知觉压力量表（PSS-10）",
+        nameEn = "Perceived Stress Scale – 10 items (PSS-10)",
+        shortName = "PSS-10",
+        category = "注意力与其他",
+        categoryEn = "Attention & other",
+        description = "10 项自评，了解过去一个月感受到的压力；4 个正向题反向计分。",
+        descriptionEn = "A 10-item measure of perceived stress over the past month; four positive items are reverse-scored.",
+        timeframe = "过去一个月",
+        timeframeEn = "Over the past month",
+        instruction = "请选择过去一个月最符合你感受的频率。",
+        instructionEn = "Choose the frequency that best describes your feelings over the past month.",
+        questions = listOf(
+            q("因为发生了意想不到的事而感到心烦意乱", "Been upset because of something that happened unexpectedly", pssFreq),
+            q("觉得无法控制生活中重要的事情", "Felt unable to control the important things in your life", pssFreq),
+            q("感到紧张、有压力", "Felt nervous and stressed", pssFreq),
+            q("对自己处理个人问题的能力有信心", "Felt confident about your ability to handle your personal problems", pssFreqReversed),
+            q("觉得事情正按自己的意愿发展", "Felt that things were going your way", pssFreqReversed),
+            q("发现自己无法应付所有必须做的事", "Found that you could not cope with all the things you had to do", pssFreq),
+            q("能够控制生活中令人恼火的小事", "Been able to control irritations in your life", pssFreqReversed),
+            q("觉得自己能把事情处理得很好", "Felt that you were on top of things", pssFreqReversed),
+            q("因为一些超出自己控制的事而生气", "Been angered because of things that were outside of your control", pssFreq),
+            q("觉得困难堆积如山，无法克服", "Felt difficulties were piling up so high that you could not overcome them", pssFreq)
+        ),
+        bands = listOf(
+            b(0, 13, "low", "压力较低", "Lower stress", "目前的压力感受较低。", "Your current perceived stress appears lower."),
+            b(14, 26, "moderate", "中等压力", "Moderate stress", "压力处于中等水平。可以留意睡眠、休息和支持系统。", "Stress is moderate. Pay attention to sleep, rest and support."),
+            b(27, 40, "high", "压力较高", "Higher stress", "压力感受较高。建议给自己安排恢复时间，并与信任的人或专业人员聊聊。", "Perceived stress is higher. Build in recovery time and talk with someone you trust or a professional.")
+        ),
+        estimatedMinutes = 3,
+        featured = false,
+        source = "PSS-10: Cohen, Kamarck & Mermelstein (1983); Cohen & Williamson (1988) 10 题版。卡内基梅隆大学官方量表页（含官方简体中文版 PDF）：https://www.cmu.edu/dietrich/psychology/stress-immunity-disease-lab/scales/html/pss.html · https://www.cmu.edu/dietrich/psychology/stress-immunity-disease-lab/scales/pdf/pss_10_simplified_chinese.pdf",
+        sourceEn = "PSS-10: Cohen, Kamarck & Mermelstein (1983); 10-item version by Cohen & Williamson (1988). Official Carnegie Mellon scale page (including the official Simplified Chinese PDF): https://www.cmu.edu/dietrich/psychology/stress-immunity-disease-lab/scales/html/pss.html · https://www.cmu.edu/dietrich/psychology/stress-immunity-disease-lab/scales/pdf/pss_10_simplified_chinese.pdf",
+        note = "PSS-10 测量的是主观压力感受，不是诊断；作者未公布统一诊断界值，分级为常用参考范围。与 PSS-4 是同一量表的完整版与简版。",
+        noteEn = "The PSS-10 measures perceived stress, not a diagnosis. The authors did not publish a diagnostic cut-off, so bands are commonly used reference ranges. PSS-4 is the short form of this same scale."
+    )
+
+    val audit = ScaleDef(
+        type = "AUDIT",
+        name = "酒精使用障碍筛查（AUDIT，完整版）",
+        nameEn = "Alcohol Use Disorders Identification Test (AUDIT, full)",
+        shortName = "AUDIT",
+        category = "物质使用",
+        categoryEn = "Substance use",
+        description = "WHO 制定的 10 项酒精使用筛查，涵盖饮酒量、依赖信号与相关伤害。",
+        descriptionEn = "The WHO 10-item alcohol screening test covering consumption, dependence signs and alcohol-related harm.",
+        timeframe = "过去一年",
+        timeframeEn = "Over the past year",
+        instruction = "请选择最符合你过去一年饮酒情况的选项。第 9、10 题只按是否发生在过去一年计分。",
+        instructionEn = "Choose the option that best describes your drinking over the past year. Questions 9 and 10 are scored by whether it happened in the last year.",
+        questions = listOf(
+            q("你多久喝一次含酒精的饮料？", "How often do you have a drink containing alcohol?", listOf(
+                o("从不", "Never", 0),
+                o("每月一次或更少", "Monthly or less", 1),
+                o("每月 2–4 次", "2–4 times a month", 2),
+                o("每周 2–3 次", "2–3 times a week", 3),
+                o("每周 4 次或更多", "4 or more times a week", 4)
+            )),
+            q("喝酒的日子里，通常喝多少杯（标准杯）？", "How many standard drinks do you have on a typical day when you are drinking?", listOf(
+                o("1–2 杯", "1 or 2", 0),
+                o("3–4 杯", "3 or 4", 1),
+                o("5–6 杯", "5 or 6", 2),
+                o("7–9 杯", "7 to 9", 3),
+                o("10 杯或以上", "10 or more", 4)
+            )),
+            q("你多久一次在单次场合喝 6 杯或更多？", "How often do you have six or more drinks on one occasion?", auditFreq),
+            q("过去一年，你多久一次开始喝酒后停不下来？", "How often during the last year have you found that you were not able to stop drinking once you had started?", auditFreq),
+            q("过去一年，你多久一次因为喝酒而做不到平常该做的事？", "How often during the last year have you failed to do what was normally expected of you because of drinking?", auditFreq),
+            q("过去一年，你多久一次需要在清晨先喝一杯，才能从宿醉中缓过来？", "How often during the last year have you needed a first drink in the morning to get yourself going after a heavy drinking session?", auditFreq),
+            q("过去一年，你多久一次在喝酒后感到内疚或后悔？", "How often during the last year have you had a feeling of guilt or remorse after drinking?", auditFreq),
+            q("过去一年，你多久一次因为喝酒而记不起前一晚发生的事？", "How often during the last year have you been unable to remember what happened the night before because of your drinking?", auditFreq),
+            q("你或别人曾因为你的饮酒而受伤吗？", "Have you or someone else been injured as a result of your drinking?", auditYesNo),
+            q("亲友、医生或其他卫生人员曾担心你的饮酒，或建议你减少饮酒吗？", "Has a relative, friend, doctor or other health worker been concerned about your drinking or suggested you cut down?", auditYesNo)
+        ),
+        bands = listOf(
+            b(0, 7, "low", "低风险", "Low risk", "目前属于低风险饮酒范围。", "Your drinking is currently in the lower-risk range."),
+            b(8, 15, "increasing", "风险上升", "Increasing risk", "属于危险性饮酒范围。建议减少饮酒，并与医生或专业人员讨论。", "This falls in the hazardous drinking range. Consider cutting down and discussing it with a doctor or professional."),
+            b(16, 19, "higher", "较高风险", "Higher risk", "属于有害性饮酒范围。建议尽快接受专业评估与持续随访。", "This falls in the harmful drinking range. Consider a professional assessment and ongoing monitoring soon."),
+            b(20, 40, "dependence", "可能存在依赖", "Possible dependence", "20 分及以上提示可能存在酒精依赖，建议转介专业评估。不要自行突然停酒，戒断反应可能有危险。", "A score of 20 or more suggests possible alcohol dependence and warrants specialist assessment. Do not stop suddenly on your own; withdrawal can be dangerous.")
+        ),
+        estimatedMinutes = 3,
+        featured = false,
+        source = "AUDIT: Saunders 等 (1993)，WHO 协作项目；WHO《AUDIT 初级卫生保健使用指南》。官方条目与计分（英国政府出版 / Flinders 大学 NCETA / PubMed Central）：https://www.gov.uk/government/uploads/system/uploads/attachment_data/file/684823/Alcohol_use_disorders_identification_test__AUDIT_.pdf · https://aodscreening.flinders.edu.au/download_file/force/79/194 · https://pmc.ncbi.nlm.nih.gov/articles/PMC4530292/",
+        sourceEn = "AUDIT: Saunders et al. (1993), WHO collaborative project; WHO Guidelines for Use in Primary Health Care. Official items and scoring (UK Government / Flinders University NCETA / PubMed Central): https://www.gov.uk/government/uploads/system/uploads/attachment_data/file/684823/Alcohol_use_disorders_identification_test__AUDIT_.pdf · https://aodscreening.flinders.edu.au/download_file/force/79/194 · https://pmc.ncbi.nlm.nih.gov/articles/PMC4530292/",
+        note = "AUDIT 是筛查工具，不是诊断；部分地区按性别使用不同的界值。与 AUDIT-C（前 3 题）是完整版与简版的关系。",
+        noteEn = "The AUDIT is a screening tool, not a diagnosis; some regions use sex-specific cut-offs. AUDIT-C is the 3-item short form of the same instrument."
+    )
+
+    val ucla3 = ScaleDef(
+        type = "UCLA3",
+        name = "三题孤独感量表（UCLA-3）",
+        nameEn = "Three-Item UCLA Loneliness Scale (UCLA-3)",
+        shortName = "UCLA-3",
+        category = "整体状态",
+        categoryEn = "General wellbeing",
+        description = "3 项简短自评，了解最近主观上的孤独与疏离感。",
+        descriptionEn = "A 3-item brief measure of subjective loneliness and social isolation.",
+        timeframe = "最近 / 总体",
+        timeframeEn = "These days / in general",
+        instruction = "请按最近的整体感受，选择每种情况发生的频率。",
+        instructionEn = "Based on how you have generally been feeling lately, choose how often each applies.",
+        questions = listOf(
+            q("你觉得缺少陪伴的频率是？", "How often do you feel that you lack companionship?", ucla3Freq),
+            q("你觉得自己被冷落、被排除在外的频率是？", "How often do you feel left out?", ucla3Freq),
+            q("你觉得自己与他人隔绝的频率是？", "How often do you feel isolated from others?", ucla3Freq)
+        ),
+        bands = listOf(
+            b(3, 5, "low", "孤独感不明显", "Not lonely", "目前的孤独感不明显。", "Loneliness does not appear prominent right now."),
+            b(6, 9, "high", "孤独感较明显", "Lonely", "得分达到常用界值（6 分）。孤独感是可以被照顾的信号，可以慢慢增加一点让你感到安全的连接；如果持续困扰，建议与专业人员聊聊。", "Your score reaches the commonly used cut-off of 6. Loneliness is a signal worth caring for; consider gently adding connections that feel safe, and talk with a professional if it persists.")
+        ),
+        estimatedMinutes = 1,
+        featured = false,
+        source = "UCLA-3: Hughes, Waite, Hawkley & Cacioppo (2004), Research on Aging 26(6): 655–672。公共领域；条目与 3–9 / 6 分界值见：https://pmc.ncbi.nlm.nih.gov/articles/PMC9483694/ · https://healthyagingnc.com/wp-content/uploads/2025/03/Three-item-UCLA-Loneliness-Scale.pdf",
+        sourceEn = "UCLA-3: Hughes, Waite, Hawkley & Cacioppo (2004), Research on Aging 26(6): 655-672. Public domain; items and the 3-9 / cut-off of 6: https://pmc.ncbi.nlm.nih.gov/articles/PMC9483694/ · https://healthyagingnc.com/wp-content/uploads/2025/03/Three-item-UCLA-Loneliness-Scale.pdf",
+        note = "孤独感是主观感受，不等于独处，也不等于抑郁；量表不是诊断工具。",
+        noteEn = "Loneliness is a subjective feeling, not the same as being alone or being depressed; this is not a diagnostic tool."
+    )
+
     val all: List<ScaleDef> = listOf(
         phq9,
         gad7,
@@ -1398,7 +1600,11 @@ object ScaleCatalog {
         psqi,
         pss4,
         rosenberg,
-        aq10
+        aq10,
+        k6,
+        pss10,
+        audit,
+        ucla3
     )
 
     val featured: List<ScaleDef> = all.filter { it.featured }

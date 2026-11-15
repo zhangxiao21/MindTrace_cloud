@@ -13,6 +13,24 @@
 - **AUDIT-C** — Bush 等 / World Health Organization。非商业使用请保留来源说明。
 - **ASRS-5** — World Health Organization / Ustun 等。非商业使用请保留来源说明。
 - **SCOFF** — Morgan, Reid & Lacey。临床与研究常用，请保留来源说明。
+- **K6 / Kessler-6** — Kessler 等（2002）。公共领域；条目、0–4 反向计分与 ≥13 界值见美国 CDC / NCHS、SAMHSA 与哈佛医学院 National Comorbidity Survey。
+  - https://www.cdc.gov/nchs/products/databriefs/db203.htm
+  - https://www.cdc.gov/dhdsp/health_equity/psychosocial.htm
+  - https://www.hcp.med.harvard.edu/ncs/k6_scales.php
+- **UCLA-3（三题孤独感量表）** — Hughes, Waite, Hawkley & Cacioppo（2004），*Research on Aging* 26(6): 655–672。公共领域；3–9 分、6 分界值见：
+  - https://pmc.ncbi.nlm.nih.gov/articles/PMC9483694/
+  - https://healthyagingnc.com/wp-content/uploads/2025/03/Three-item-UCLA-Loneliness-Scale.pdf
+
+### 0.4.2 新增：官方公开版本（请保留来源说明）
+
+- **PSS-10（知觉压力量表 10 题版）** — Cohen, Kamarck & Mermelstein（1983）；10 题版由 Cohen & Williamson（1988）常模化。卡内基梅隆大学 Cohen 实验室公开发布量表与官方简体中文版，非商业研究与教育使用请保留出处；第 4、5、7、8 题反向计分。
+  - https://www.cmu.edu/dietrich/psychology/stress-immunity-disease-lab/scales/html/pss.html
+  - https://www.cmu.edu/dietrich/psychology/stress-immunity-disease-lab/scales/pdf/pss_10_simplified_chinese.pdf
+- **AUDIT（酒精使用障碍筛查，完整 10 题）** — Saunders 等（1993）WHO 协作项目，WHO《AUDIT 初级卫生保健使用指南》。条目与 0–40 计分、0–7 / 8–15 / 16–19 / 20+ 分级见以下官方 / 学术公开资料；Q9、Q10 按 0 / 2 / 4 计分。
+  - https://www.gov.uk/government/uploads/system/uploads/attachment_data/file/684823/Alcohol_use_disorders_identification_test__AUDIT_.pdf
+  - https://aodscreening.flinders.edu.au/download_file/force/79/194
+  - https://pmc.ncbi.nlm.nih.gov/articles/PMC4530292/
+  - 注：AUDIT-C 是同一量表的前 3 题简版；PSS-4 是 PSS-10 的 4 题简版，二者已在应用内并列表注。
 
 ### 需要确认电子版/再分发条款的量表
 

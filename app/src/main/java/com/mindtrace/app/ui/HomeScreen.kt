@@ -1,7 +1,9 @@
 package com.mindtrace.app.ui
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,8 +24,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Assignment
 import androidx.compose.material.icons.rounded.ChevronRight
+import androidx.compose.material.icons.rounded.DarkMode
 import androidx.compose.material.icons.rounded.Description
 import androidx.compose.material.icons.rounded.EditNote
+import androidx.compose.material.icons.rounded.LightMode
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.Insights
 import androidx.compose.material.icons.rounded.Medication
@@ -46,6 +50,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -87,6 +92,14 @@ fun HomeScreen(
     val scales by viewModel.scales.collectAsStateWithLifecycle()
     val journal by viewModel.journal.collectAsStateWithLifecycle()
     val language = LocalAppLanguage.current
+    val context = LocalContext.current
+    val settings by viewModel.settings.collectAsStateWithLifecycle()
+    val systemDark = isSystemInDarkTheme()
+    val effectiveDark = when (settings.themeMode) {
+        "dark" -> true
+        "light" -> false
+        else -> systemDark
+    }
     val today = DateUtils.todayIso()
     val todayCheckIn = checkIns.firstOrNull { it.date == today }
     val symptomNames = remember(symptoms) { symptoms.associate { it.id to it.name } }
@@ -164,12 +177,25 @@ fun HomeScreen(
                     tint = MaterialTheme.colorScheme.secondary,
                     onClick = onOpenMedications
                 )
+                // 原来这里是第二个「自评量表」入口，与下方的「最近的自评」卡片重复。
+                // 改成一键深浅切换：既不重复，也让主题切换在首页就能一步完成。
                 QuickAction(
                     modifier = Modifier.weight(1f),
-                    icon = Icons.Rounded.Assignment,
-                    title = "自评量表",
+                    icon = if (effectiveDark) Icons.Rounded.LightMode else Icons.Rounded.DarkMode,
+                    title = if (effectiveDark) "切换浅色" else "切换深色",
                     tint = MaterialTheme.colorScheme.tertiary,
-                    onClick = onOpenScales
+                    onClick = {
+                        val next = if (effectiveDark) "light" else "dark"
+                        viewModel.setThemeMode(next)
+                        Toast.makeText(
+                            context,
+                            translate(
+                                if (effectiveDark) "已切换到浅色" else "已切换到深色",
+                                language
+                            ),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 )
             }
         }

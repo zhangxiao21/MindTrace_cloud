@@ -150,6 +150,37 @@ private val PaletteRose = AccentPalette(
     0xFFFAF0F2, 0xFFFFF8FA, 0xFF170F12, 0xFF241A1E
 )
 
+/**
+ * 主题选项的唯一数据源。设置页、快捷切换面板与备份恢复校验都读这里，
+ * 避免同一套色值/模式在多个文件里各写一份。
+ */
+data class ThemeColorOption(
+    val code: String,
+    val label: String,
+    val labelEn: String,
+    val swatch: Color
+)
+
+val ThemeColorOptions = listOf(
+    ThemeColorOption("sage", "青绿", "Sage", Color(0xFF6B8F7B)),
+    ThemeColorOption("ocean", "海蓝", "Ocean", Color(0xFF4F7FA8)),
+    ThemeColorOption("plum", "梅紫", "Plum", Color(0xFF8A5F9E)),
+    ThemeColorOption("amber", "琥珀", "Amber", Color(0xFF9A6B2F)),
+    ThemeColorOption("rose", "玫瑰", "Rose", Color(0xFFA85A6E))
+)
+
+data class ThemeModeOption(
+    val code: String,
+    val label: String,
+    val labelEn: String
+)
+
+val ThemeModeOptions = listOf(
+    ThemeModeOption("system", "跟随系统", "System"),
+    ThemeModeOption("light", "浅色", "Light"),
+    ThemeModeOption("dark", "深色", "Dark")
+)
+
 private fun paletteFor(name: String): AccentPalette? = when (name) {
     "ocean" -> PaletteOcean
     "plum" -> PalettePlum

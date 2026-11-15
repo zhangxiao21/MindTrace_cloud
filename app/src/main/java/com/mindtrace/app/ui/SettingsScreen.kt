@@ -10,6 +10,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.biometric.BiometricManager
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -28,13 +29,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Backup
 import androidx.compose.material.icons.rounded.ChevronRight
+import androidx.compose.material.icons.rounded.CloudUpload
 import androidx.compose.material.icons.rounded.Description
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.FileDownload
-import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.Notifications
+import androidx.compose.material.icons.rounded.Palette
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material.icons.rounded.Restore
 import androidx.compose.material.icons.rounded.Security
@@ -77,9 +79,12 @@ import com.mindtrace.app.ui.components.ScreenHeader
 import com.mindtrace.app.ui.components.SectionTitle
 import com.mindtrace.app.ui.components.SegmentedOptions
 import com.mindtrace.app.ui.components.SoftCard
+import com.mindtrace.app.ui.components.ThemePickerDialog
 import com.mindtrace.app.ui.components.TimeField
 import com.mindtrace.app.ui.i18n.LocalAppLanguage
 import com.mindtrace.app.ui.i18n.translate
+import com.mindtrace.app.ui.theme.ThemeColorOptions
+import com.mindtrace.app.ui.theme.ThemeModeOptions
 import com.mindtrace.app.work.NotificationHelper
 import com.mindtrace.app.work.ReminderScheduler
 import kotlinx.coroutines.launch
@@ -101,6 +106,7 @@ fun SettingsScreen(
     onOpenSafety: () -> Unit = {},
     onOpenCrisis: () -> Unit = {},
     onOpenReport: () -> Unit = {},
+    onOpenCloudBackup: () -> Unit = {},
     onOpenAbout: () -> Unit = {},
     onOpenSponsor: () -> Unit = {},
     onOpenPrivacy: () -> Unit = {},
@@ -129,7 +135,19 @@ fun SettingsScreen(
     var pendingRestoreUri by remember { mutableStateOf<Uri?>(null) }
     var backupPassword by remember { mutableStateOf("") }
     var showDeleteAll by remember { mutableStateOf(false) }
+    var showThemePicker by remember { mutableStateOf(false) }
     var busy by remember { mutableStateOf(false) }
+
+    // 主题选项集中放在 Theme.kt，这里只负责显示当前值与打开切换面板。
+    val modeOption = ThemeModeOptions.firstOrNull { it.code == settings.themeMode }
+        ?: ThemeModeOptions.first()
+    val colorOption = ThemeColorOptions.firstOrNull { it.code == settings.themeColor }
+        ?: ThemeColorOptions.first()
+    val appearanceSubtitle = if (language.isEnglish) {
+        "${modeOption.labelEn} · ${colorOption.labelEn} · tap to change"
+    } else {
+        "${modeOption.label} · ${colorOption.label} · 点击切换"
+    }
 
     val notificationPermission = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -361,30 +379,12 @@ fun SettingsScreen(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Spacer(Modifier.height(14.dp))
-                SectionTitle("外观", subtitle = "浅色 / 深色 / 跟随系统")
-                Spacer(Modifier.height(10.dp))
-                SegmentedOptions(
-                    options = listOf(
-                        "system" to "跟随系统",
-                        "light" to "浅色",
-                        "dark" to "深色"
-                    ),
-                    selected = settings.themeMode,
-                    onSelect = { viewModel.setThemeMode(it) }
-                )
-                Spacer(Modifier.height(14.dp))
-                SectionTitle("主题色", subtitle = "换一种主色，深浅模式通用")
-                Spacer(Modifier.height(10.dp))
-                SegmentedOptions(
-                    options = listOf(
-                        "sage" to "青绿",
-                        "ocean" to "海蓝",
-                        "plum" to "梅紫",
-                        "amber" to "琥珀",
-                        "rose" to "玫瑰"
-                    ),
-                    selected = settings.themeColor,
-                    onSelect = { viewModel.setThemeColor(it) }
+                // 主题的完整编辑只在统一的切换面板里做，避免同一页出现两套重复控件。
+                SettingRow(
+                    icon = Icons.Rounded.Palette,
+                    title = "外观与主题",
+                    subtitle = appearanceSubtitle,
+                    onClick = { showThemePicker = true }
                 )
             }
             }
@@ -646,7 +646,7 @@ fun SettingsScreen(
                 SettingRow(
                     icon = Icons.Rounded.Backup,
                     title = "导出加密备份",
-                    subtitle = "含记录、药物、量表、日记、安全计划；不含 PIN 和提醒设置",
+                    subtitle = "含记录、界面设置与云备份配置；凭据二次加密，不含 PIN",
                     onClick = { showBackupPassword = true }
                 )
                 SettingRow(
@@ -662,6 +662,12 @@ fun SettingsScreen(
                     onClick = { openBackup.launch(arrayOf("application/octet-stream", "*/*")) }
                 )
                 SettingRow(
+                    icon = Icons.Rounded.CloudUpload,
+                    title = "云备份",
+                    subtitle = "WebDAV / Gitee / GitHub，上传加密备份或下载恢复",
+                    onClick = onOpenCloudBackup
+                )
+                SettingRow(
                     icon = Icons.Rounded.Warning,
                     title = "删除全部数据",
                     subtitle = "不可恢复，请先导出备份",
@@ -673,6 +679,11 @@ fun SettingsScreen(
                     "更换手机或卸载前请先导出加密备份。卸载会销毁本机密钥，数据无法恢复；PIN 和备份密码也没有找回入口。",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(Modifier.height(8.dp))
+                InfoBanner(
+                    text = "新版备份会一并保存界面设置与云备份配置（账号、令牌在密码之外再加密一层）；0.4.1 及更早版本的 .mtrbackup 仍可直接导入。",
+                    icon = Icons.Rounded.Security
                 )
             }
             }
@@ -690,7 +701,7 @@ fun SettingsScreen(
                 SettingRow(
                     icon = Icons.Rounded.Security,
                     title = "隐私说明",
-                    subtitle = "无网络权限、加密存储与数据边界",
+                    subtitle = "默认离线、手动云备份与数据边界",
                     onClick = onOpenPrivacy
                 )
                 SettingRow(
@@ -814,6 +825,17 @@ fun SettingsScreen(
                 }
             },
             onDismiss = { showDeleteAll = false }
+        )
+    }
+
+    if (showThemePicker) {
+        ThemePickerDialog(
+            mode = settings.themeMode,
+            color = settings.themeColor,
+            systemDark = isSystemInDarkTheme(),
+            onModeChange = { viewModel.setThemeMode(it) },
+            onColorChange = { viewModel.setThemeColor(it) },
+            onDismiss = { showThemePicker = false }
         )
     }
 }

@@ -59,6 +59,7 @@ private object Routes {
     const val JOURNAL_EDIT = "journal_edit/{journalId}/{date}"
     const val MED_EDIT = "med_edit/{medId}"
     const val MED_BACKFILL = "med_backfill"
+    const val CLOUD_BACKUP = "cloud_backup"
     const val SCALES = "scales"
     const val SCALES_ALL = "scales_all"
     const val SCALE = "scale/{type}"
@@ -267,7 +268,8 @@ fun MainApp(
                         onOpenDiagnoses = { navController.navigate(Routes.DIAGNOSES) },
                         onOpenSafety = { navController.navigate(Routes.SAFETY) },
                         onOpenCrisis = { navController.navigate(Routes.CRISIS) },
-                        onOpenReport = { navController.navigate(Routes.REPORT) }
+                        onOpenReport = { navController.navigate(Routes.REPORT) },
+                        onOpenCloudBackup = { navController.navigate(Routes.CLOUD_BACKUP) }
                     )
                 }
 
@@ -367,6 +369,14 @@ fun MainApp(
                     )
                 }
 
+                // 唯一的云备份入口：从「我的 → 数据与报告」进入，设置页不再重复放置。
+                composable(Routes.CLOUD_BACKUP) {
+                    CloudBackupScreen(
+                        viewModel = viewModel,
+                        onBack = { navController.popBackStack() }
+                    )
+                }
+
                 composable(Routes.SCALES) {
                     ScalesScreen(
                         viewModel = viewModel,
@@ -443,10 +453,7 @@ fun MainApp(
                 composable(Routes.ABOUT) {
                     AboutScreen(
                         onBack = { navController.popBackStack() },
-                        onOpenPrivacy = { navController.navigate(Routes.PRIVACY) },
-                        onOpenSafety = { navController.navigate(Routes.SAFETY) },
-                        onOpenTerms = { navController.navigate(Routes.TERMS) },
-                        onOpenSupport = { navController.navigate(Routes.SUPPORT) }
+                        onOpenSafety = { navController.navigate(Routes.SAFETY) }
                     )
                 }
 

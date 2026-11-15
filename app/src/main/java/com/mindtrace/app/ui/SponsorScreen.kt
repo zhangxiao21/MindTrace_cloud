@@ -105,7 +105,7 @@ fun SponsorScreen(onBack: () -> Unit) {
                             if (english) {
                                 "MindTrace has no ads, no tracking and no network permission. Sponsorship is optional and only supports maintenance and new features; nothing in the app is locked behind it."
                             } else {
-                                "心迹没有广告、没有追踪，也没有网络权限。赞助完全自愿，只会用于维护与继续开发；App 里没有任何功能需要付费解锁。"
+                                "心迹没有广告、没有追踪，默认也不会联网。赞助完全自愿，只会用于维护与继续开发；App 里没有任何功能需要付费解锁。"
                             },
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurface

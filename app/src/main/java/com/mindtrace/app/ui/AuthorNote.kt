@@ -9,7 +9,7 @@ object AuthorNote {
         "后来我开始记。每天一分钟，打个卡：睡了几小时、心情几分、吃了什么药、有没有那种说不上来的难受。复诊前生成一页纸，打印出来带过去，交给医生。",
         "这个 App 里的量表、指南、科普——不是编的，均有来源可查。让你在最困难的日子里，不被未知所困惑。",
         "心迹不是医疗器械，不诊断，不治疗，不代替医生。生病请向医生求助，请勿依赖软件。",
-        "心迹没有联网权限，没有服务器。所有的记录都在本机，本地加密。除非你主动给别人看，没有人能知道你的状态。",
+        "心迹默认不联网，也没有服务器；只有你手动开启云备份时才会传输加密备份。所有记录都在本机加密保存。除非你主动给别人看，没有人能知道你的状态。",
         "此软件免费向大家开放，没有广告，也不收费。希望能够帮助到每一个需要心迹的人。如果觉得好用且有能力的话，可以在爱发电上请作者喝一杯咖啡。",
         "——心迹作者"
     )
@@ -21,7 +21,7 @@ object AuthorNote {
         "So I started recording. One minute a day, a check-in: how many hours I slept, my mood out of five, which medication I took, and whether that indescribable discomfort was there. Before an appointment I generate a one-page report, print it out and hand it to the doctor.",
         "The scales, guidelines and education content in this app are not invented; every piece has a traceable source, so that on your hardest days you are not left facing the unknown.",
         "MindTrace is not a medical device. It does not diagnose, treat, or replace a doctor. If you are ill, please seek medical help and do not rely on software.",
-        "MindTrace has no network permission and no server. All records stay on this device, encrypted locally. Unless you choose to show someone, no one can know your state.",
+        "MindTrace is offline by default and has no server; only a cloud backup you start manually transfers an encrypted backup. All records stay encrypted on this device. Unless you choose to show someone, no one can know your state.",
         "This app is free for everyone, with no ads and no fees. I hope it can help everyone who needs MindTrace. If you find it useful and can afford it, you can buy the author a coffee on Afdian.",
         "— The author of MindTrace"
     )

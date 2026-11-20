@@ -69,6 +69,7 @@ private object Routes {
     const val PRIVACY = "privacy"
     const val TERMS = "terms"
     const val SUPPORT = "support"
+    const val SPONSOR = "sponsor"
     const val REMINDER_HELP = "reminder_help"
 }
 
@@ -92,7 +93,7 @@ fun MainApp(
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
     val showBottomBar = tabs.any { it.route == currentRoute }
-    // 赞助页、作者的话与按启动次数弹出的提示已整体移除。
+    // 作者的话与赞助保留为「设置 → 赞助与作者的话」中手动进入的页面，不再按启动次数自动弹出。
     LaunchedEffect(initialDestination) {
         when (initialDestination) {
             "checkin" -> {
@@ -266,8 +267,13 @@ fun MainApp(
                         onOpenPrivacy = { navController.navigate(Routes.PRIVACY) },
                         onOpenReminderHelp = { navController.navigate(Routes.REMINDER_HELP) },
                         onOpenTerms = { navController.navigate(Routes.TERMS) },
-                        onOpenSupport = { navController.navigate(Routes.SUPPORT) }
+                        onOpenSupport = { navController.navigate(Routes.SUPPORT) },
+                        onOpenSponsor = { navController.navigate(Routes.SPONSOR) }
                     )
+                }
+
+                composable(Routes.SPONSOR) {
+                    SponsorScreen(onBack = { navController.popBackStack() })
                 }
 
                 composable(

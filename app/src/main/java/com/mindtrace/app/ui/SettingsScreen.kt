@@ -109,6 +109,7 @@ fun SettingsScreen(
     onOpenReport: () -> Unit = {},
     onOpenCloudBackup: () -> Unit = {},
     onOpenAbout: () -> Unit = {},
+    onOpenSponsor: () -> Unit = {},
     onOpenPrivacy: () -> Unit = {},
     onOpenReminderHelp: () -> Unit = {},
     onOpenTerms: () -> Unit = {},
@@ -703,6 +704,12 @@ fun SettingsScreen(
                     title = "隐私说明",
                     subtitle = "默认离线、手动云备份与数据边界",
                     onClick = onOpenPrivacy
+                )
+                SettingRow(
+                    icon = Icons.Rounded.Favorite,
+                    title = "赞助与作者的话",
+                    subtitle = "支持心迹继续更新 · 作者的话",
+                    onClick = onOpenSponsor
                 )
                 SettingRow(
                     icon = Icons.Rounded.Info,

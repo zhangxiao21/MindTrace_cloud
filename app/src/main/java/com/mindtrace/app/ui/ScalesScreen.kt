@@ -49,7 +49,8 @@ fun ScalesScreen(
     viewModel: AppViewModel,
     onBack: () -> Unit,
     onStartScale: (String) -> Unit,
-    onOpenAllScales: () -> Unit
+    onOpenAllScales: () -> Unit,
+    onOpenHistory: () -> Unit
 ) {
     val scales by viewModel.scales.collectAsStateWithLifecycle()
     val english = LocalAppLanguage.current.isEnglish
@@ -129,7 +130,13 @@ fun ScalesScreen(
         }
         if (scales.isNotEmpty()) {
             item {
-                SectionTitle("最近测评", subtitle = "可以删除不需要的记录")
+                SectionTitle(
+                    "最近测评",
+                    subtitle = "可以删除不需要的记录",
+                    action = {
+                        TextButton(onClick = onOpenHistory) { Text("全部") }
+                    }
+                )
             }
             items(scales.take(8), key = { "history-${it.id}" }) { item ->
                 RecentScaleRow(
@@ -265,9 +272,9 @@ private fun ScaleCard(
                     if (latest != null) {
                         Text(
                             if (english) {
-                                "Last: ${latest.score} / ${def.maxScore} · ${band?.let { def.bandLabel(it, true) } ?: latest.severity}"
+                                "Last: ${def.formatScore(latest.score)} / ${def.formatMaxScore()} · ${band?.let { def.bandLabel(it, true) } ?: latest.severity}"
                             } else {
-                                "最近一次：${latest.score} / ${def.maxScore} · ${band?.let { def.bandLabel(it, false) } ?: latest.severity}"
+                                "最近一次：${def.formatScore(latest.score)} / ${def.formatMaxScore()} · ${band?.let { def.bandLabel(it, false) } ?: latest.severity}"
                             },
                             style = MaterialTheme.typography.labelLarge,
                             color = MaterialTheme.colorScheme.primary,
@@ -328,9 +335,9 @@ private fun ScaleCard(
             Spacer(Modifier.height(10.dp))
             Text(
                 if (english) {
-                    "Last: ${latest.score} / ${def.maxScore} · ${band?.let { def.bandLabel(it, true) } ?: latest.severity}"
+                    "Last: ${def.formatScore(latest.score)} / ${def.formatMaxScore()} · ${band?.let { def.bandLabel(it, true) } ?: latest.severity}"
                 } else {
-                    "最近一次：${latest.score} / ${def.maxScore} · ${band?.let { def.bandLabel(it, false) } ?: latest.severity}"
+                    "最近一次：${def.formatScore(latest.score)} / ${def.formatMaxScore()} · ${band?.let { def.bandLabel(it, false) } ?: latest.severity}"
                 },
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.primary
@@ -369,7 +376,7 @@ private fun RecentScaleRow(
                     style = MaterialTheme.typography.titleMedium
                 )
                 Text(
-                    "${DateUtils.displayTimestamp(item.createdAt)} · ${item.score}${def?.let { " / ${it.maxScore}" } ?: ""}",
+                    "${DateUtils.displayTimestamp(item.createdAt)} · ${def?.formatScore(item.score) ?: item.score}${def?.let { " / ${it.formatMaxScore()}" } ?: ""}",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

@@ -19,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Assignment
 import androidx.compose.material.icons.rounded.ChevronRight
 import androidx.compose.material.icons.rounded.Description
+import androidx.compose.material.icons.rounded.History
 import androidx.compose.material.icons.rounded.Insights
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -55,6 +56,7 @@ import com.mindtrace.app.ui.components.LineTrendChart
 import com.mindtrace.app.ui.components.MetricTile
 import com.mindtrace.app.ui.components.Pill
 import com.mindtrace.app.ui.components.SectionTitle
+import com.mindtrace.app.ui.components.SimpleDatePickerDialog
 import com.mindtrace.app.ui.components.SegmentedOptions
 import com.mindtrace.app.ui.components.SoftCard
 import java.util.Locale
@@ -63,7 +65,9 @@ import java.util.Locale
 fun InsightsScreen(
     viewModel: AppViewModel,
     onOpenScales: () -> Unit,
-    onOpenReport: () -> Unit
+    onOpenReport: () -> Unit,
+    onBackdatedCheckIn: (String) -> Unit,
+    onOpenScaleHistory: () -> Unit
 ) {
     val days by viewModel.insightsDays.collectAsStateWithLifecycle()
     val checkIns by viewModel.insightsCheckIns.collectAsStateWithLifecycle()
@@ -148,12 +152,30 @@ fun InsightsScreen(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         item {
-            Column {
-                Text("趋势", style = MaterialTheme.typography.headlineMedium)
-                Text(
-                    "看见变化，而不是审判自己。",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+            var showStatusPicker by remember { mutableStateOf(false) }
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text("趋势", style = MaterialTheme.typography.headlineMedium)
+                    Text(
+                        "看见变化，而不是审判自己。",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                TextButton(onClick = { showStatusPicker = true }) {
+                    Icon(Icons.Rounded.History, contentDescription = null, modifier = Modifier.width(18.dp))
+                    Text("  补记状态")
+                }
+            }
+            if (showStatusPicker) {
+                SimpleDatePickerDialog(
+                    initialIso = DateUtils.todayIso(),
+                    title = "补记状态",
+                    onDismiss = { showStatusPicker = false },
+                    onPick = { date ->
+                        showStatusPicker = false
+                        onBackdatedCheckIn(date)
+                    }
                 )
             }
         }
@@ -351,7 +373,7 @@ fun InsightsScreen(
         }
 
         item {
-            ScaleSummaryCard(scales = scales, onClick = onOpenScales)
+            ScaleSummaryCard(scales = scales, onClick = onOpenScales, onOpenHistory = onOpenScaleHistory)
         }
 
         item {
@@ -387,7 +409,11 @@ fun InsightsScreen(
 }
 
 @Composable
-private fun ScaleSummaryCard(scales: List<ScaleAssessmentEntity>, onClick: () -> Unit) {
+private fun ScaleSummaryCard(
+    scales: List<ScaleAssessmentEntity>,
+    onClick: () -> Unit,
+    onOpenHistory: () -> Unit
+) {
     val english = LocalAppLanguage.current.isEnglish
     val latest = ScaleCatalog.all.mapNotNull { def ->
         scales.firstOrNull { it.type == def.type }?.let { def to it }
@@ -402,6 +428,7 @@ private fun ScaleSummaryCard(scales: List<ScaleAssessmentEntity>, onClick: () ->
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
+            TextButton(onClick = onOpenHistory) { Text("全部") }
             Icon(Icons.Rounded.Assignment, contentDescription = null, tint = MaterialTheme.colorScheme.tertiary)
         }
         if (latest.isEmpty()) {
@@ -422,7 +449,7 @@ private fun ScaleSummaryCard(scales: List<ScaleAssessmentEntity>, onClick: () ->
                     ) {
                         Text(def.shortName, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Text(
-                            "${result.score} / ${def.maxScore}",
+                            "${def.formatScore(result.score)} / ${def.formatMaxScore()}",
                             style = MaterialTheme.typography.titleLarge,
                             color = scoreColor(result, def.type)
                         )

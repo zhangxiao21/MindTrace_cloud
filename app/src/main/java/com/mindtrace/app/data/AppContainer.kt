@@ -18,6 +18,7 @@ class AppContainer(context: Context) {
 
     init {
         AppLocale.current = settings.resolvedLanguage()
+        // 启动计数仅作为通用的设置项保留（备份 v2 会读写它），不再触发任何赞助提示。
         settings.appLaunchCount = settings.appLaunchCount + 1
     }
 

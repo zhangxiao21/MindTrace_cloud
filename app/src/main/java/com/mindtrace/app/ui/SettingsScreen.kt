@@ -39,6 +39,7 @@ import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.material.icons.rounded.Palette
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material.icons.rounded.Restore
+import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.Security
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.icons.rounded.Spa
@@ -108,7 +109,6 @@ fun SettingsScreen(
     onOpenReport: () -> Unit = {},
     onOpenCloudBackup: () -> Unit = {},
     onOpenAbout: () -> Unit = {},
-    onOpenSponsor: () -> Unit = {},
     onOpenPrivacy: () -> Unit = {},
     onOpenReminderHelp: () -> Unit = {},
     onOpenTerms: () -> Unit = {},
@@ -705,12 +705,6 @@ fun SettingsScreen(
                     onClick = onOpenPrivacy
                 )
                 SettingRow(
-                    icon = Icons.Rounded.Favorite,
-                    title = "赞助与作者的话",
-                    subtitle = "支持心迹继续更新 · 作者的话",
-                    onClick = onOpenSponsor
-                )
-                SettingRow(
                     icon = Icons.Rounded.Info,
                     title = "使用条款",
                     subtitle = "医疗边界、数据责任与紧急资源",
@@ -721,6 +715,20 @@ fun SettingsScreen(
                     title = "问题反馈与诊断",
                     subtitle = "复制版本与权限状态，不包含病情内容",
                     onClick = onOpenSupport
+                )
+                SettingRow(
+                    icon = Icons.Rounded.Refresh,
+                    title = "检查更新",
+                    subtitle = "在浏览器中打开 GitHub Releases",
+                    onClick = {
+                        val intent = Intent(
+                            Intent.ACTION_VIEW,
+                            Uri.parse("https://github.com/shanhangchi501-jpg/MindTrace/releases/latest")
+                        ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        runCatching { context.startActivity(intent) }.onFailure {
+                            Toast.makeText(context, "未找到浏览器", Toast.LENGTH_SHORT).show()
+                        }
+                    }
                 )
             }
             }

@@ -103,7 +103,7 @@ fun AboutScreen(
                 SectionTitle("量表与来源")
                 Spacer(Modifier.height(6.dp))
                 Text(
-                    "心迹内置 28 个自评/筛查量表，包括 PHQ-9、GAD-7、PCL-5、WHO-5、K6、PSS-10、AUDIT、UCLA-3 等。新增量表均取自权威机构公开资料并在 NOTICE.md 中列出来源。部分量表受版权保护，电子版再分发前请确认授权。所有量表仅用于筛查和追踪，不是诊断。",
+                    "心迹内置 56 个自评/筛查量表，包括 PHQ-9、GAD-7、PCL-5、WHO-5、K6、PSS-10、AUDIT、UCLA-3、ASRS-18 等，以及宗氏 SAS / SDS、HADS、GDS-15、AIS、ESS、AD8、CAGE、FTND、MSPSS 等国内医院常用量表。新增量表均附原始文献、可核对链接与使用边界，并在 NOTICE.md 中列出来源。部分量表受版权保护，电子版再分发前请确认授权。所有量表仅用于筛查和追踪，不是诊断。",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

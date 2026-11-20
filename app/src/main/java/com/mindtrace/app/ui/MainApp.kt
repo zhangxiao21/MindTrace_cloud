@@ -19,18 +19,13 @@ import androidx.compose.material.icons.rounded.Today
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import com.mindtrace.app.ui.i18n.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -40,7 +35,6 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.mindtrace.app.data.DateUtils
@@ -60,12 +54,13 @@ private object Routes {
     const val MED_EDIT = "med_edit/{medId}"
     const val MED_BACKFILL = "med_backfill"
     const val CLOUD_BACKUP = "cloud_backup"
+    const val SCALE_HISTORY = "scale_history"
+    const val JOURNAL_HISTORY = "journal_history"
     const val SCALES = "scales"
     const val SCALES_ALL = "scales_all"
     const val SCALE = "scale/{type}"
     const val REPORT = "report"
     const val SAFETY = "safety"
-    const val SPONSOR = "sponsor"
     const val CRISIS = "crisis"
     const val PROFILE = "profile"
     const val SYMPTOMS = "symptoms"
@@ -97,50 +92,7 @@ fun MainApp(
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
     val showBottomBar = tabs.any { it.route == currentRoute }
-    val settings by viewModel.settings.collectAsStateWithLifecycle()
-    var showSponsorPrompt by remember { mutableStateOf(false) }
-    val englishUi = com.mindtrace.app.ui.i18n.LocalAppLanguage.current.isEnglish
-
-    LaunchedEffect(settings.appLaunchCount, settings.sponsorPromptShown) {
-        if (settings.appLaunchCount >= 5 && !settings.sponsorPromptShown) {
-            showSponsorPrompt = true
-        }
-    }
-
-    if (showSponsorPrompt) {
-        AlertDialog(
-            onDismissRequest = {
-                showSponsorPrompt = false
-                viewModel.markSponsorPromptShown()
-            },
-            title = {
-                Text(if (englishUi) "You have opened MindTrace 5 times" else "已经打开心迹 5 次啦")
-            },
-            text = {
-                Text(
-                    if (englishUi) {
-                        "Thank you for coming back. If MindTrace helps you, you can support its development; nothing in the app is locked behind sponsorship."
-                    } else {
-                        "谢谢你愿意回来。如果心迹对你有帮助，可以支持它继续更新；不赞助也不会影响任何功能。"
-                    }
-                )
-            },
-            confirmButton = {
-                TextButton(onClick = {
-                    showSponsorPrompt = false
-                    viewModel.markSponsorPromptShown()
-                    navController.navigate(Routes.SPONSOR)
-                }) { Text(if (englishUi) "Support" else "去赞助") }
-            },
-            dismissButton = {
-                TextButton(onClick = {
-                    showSponsorPrompt = false
-                    viewModel.markSponsorPromptShown()
-                }) { Text(if (englishUi) "Later" else "以后再说") }
-            }
-        )
-    }
-
+    // 赞助页、作者的话与按启动次数弹出的提示已整体移除。
     LaunchedEffect(initialDestination) {
         when (initialDestination) {
             "checkin" -> {
@@ -234,6 +186,7 @@ fun MainApp(
                         onOpenMedications = { navController.navigate(Routes.MEDICATIONS) },
                         onOpenInsights = { navController.navigate(Routes.INSIGHTS) },
                         onOpenScales = { navController.navigate(Routes.SCALES) },
+                        onOpenAllJournals = { navController.navigate(Routes.JOURNAL_HISTORY) },
                         onOpenReport = { navController.navigate(Routes.REPORT) },
                         onOpenSafety = { navController.navigate(Routes.SAFETY) },
                         onOpenCrisis = { navController.navigate(Routes.CRISIS) }
@@ -252,7 +205,9 @@ fun MainApp(
                     InsightsScreen(
                         viewModel = viewModel,
                         onOpenScales = { navController.navigate(Routes.SCALES) },
-                        onOpenReport = { navController.navigate(Routes.REPORT) }
+                        onOpenReport = { navController.navigate(Routes.REPORT) },
+                        onBackdatedCheckIn = { date -> navController.navigate("checkin/$date") },
+                        onOpenScaleHistory = { navController.navigate(Routes.SCALE_HISTORY) }
                     )
                 }
                 PersistentTab(visible = currentRoute == Routes.LEARN) {
@@ -311,13 +266,8 @@ fun MainApp(
                         onOpenPrivacy = { navController.navigate(Routes.PRIVACY) },
                         onOpenReminderHelp = { navController.navigate(Routes.REMINDER_HELP) },
                         onOpenTerms = { navController.navigate(Routes.TERMS) },
-                        onOpenSupport = { navController.navigate(Routes.SUPPORT) },
-                        onOpenSponsor = { navController.navigate(Routes.SPONSOR) }
+                        onOpenSupport = { navController.navigate(Routes.SUPPORT) }
                     )
-                }
-
-                composable(Routes.SPONSOR) {
-                    SponsorScreen(onBack = { navController.popBackStack() })
                 }
 
                 composable(
@@ -377,12 +327,28 @@ fun MainApp(
                     )
                 }
 
+                composable(Routes.JOURNAL_HISTORY) {
+                    JournalHistoryScreen(
+                        viewModel = viewModel,
+                        onBack = { navController.popBackStack() },
+                        onOpenJournal = { id, date -> navController.navigate("journal_edit/$id/$date") }
+                    )
+                }
+
+                composable(Routes.SCALE_HISTORY) {
+                    ScaleHistoryScreen(
+                        viewModel = viewModel,
+                        onBack = { navController.popBackStack() }
+                    )
+                }
+
                 composable(Routes.SCALES) {
                     ScalesScreen(
                         viewModel = viewModel,
                         onBack = { navController.popBackStack() },
                         onStartScale = { type -> navController.navigate("scale/$type") },
-                        onOpenAllScales = { navController.navigate(Routes.SCALES_ALL) }
+                        onOpenAllScales = { navController.navigate(Routes.SCALES_ALL) },
+                        onOpenHistory = { navController.navigate(Routes.SCALE_HISTORY) }
                     )
                 }
 

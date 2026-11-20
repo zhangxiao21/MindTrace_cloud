@@ -31,6 +31,7 @@ data class UiSettings(
     val themeColor: String = "sage",
     val medicationOrder: String = "",
     val crisisCountry: String = "CN",
+    // 下面两项仅为兼容 v2 备份格式而保留，界面已不再使用它们做任何赞助提示。
     val sponsorPromptShown: Boolean = false,
     val appLaunchCount: Int = 0
 )

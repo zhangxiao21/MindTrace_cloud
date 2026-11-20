@@ -11,7 +11,7 @@
 - **PCL-5 / PC-PTSD-5** — U.S. Department of Veterans Affairs, National Center for PTSD。公共领域。
 - **WHO-5 / WHODAS 2.0** — World Health Organization。可免费用于非商业目的，请保留来源说明。
 - **AUDIT-C** — Bush 等 / World Health Organization。非商业使用请保留来源说明。
-- **ASRS-5** — World Health Organization / Ustun 等。非商业使用请保留来源说明。
+- **ASRS-5 / ASRS-18** — World Health Organization / Kessler 等。非商业使用请保留来源说明。
 - **SCOFF** — Morgan, Reid & Lacey。临床与研究常用，请保留来源说明。
 - **K6 / Kessler-6** — Kessler 等（2002）。公共领域；条目、0–4 反向计分与 ≥13 界值见美国 CDC / NCHS、SAMHSA 与哈佛医学院 National Comorbidity Survey。
   - https://www.cdc.gov/nchs/products/databriefs/db203.htm
@@ -31,6 +31,19 @@
   - https://aodscreening.flinders.edu.au/download_file/force/79/194
   - https://pmc.ncbi.nlm.nih.gov/articles/PMC4530292/
   - 注：AUDIT-C 是同一量表的前 3 题简版；PSS-4 是 PSS-10 的 4 题简版，二者已在应用内并列表注。
+- **PSS-10** — Cohen, Kamarck & Mermelstein (1983)。研究与教育用途可免费使用；商业使用请先确认授权。
+- **STOP-BANG** — Chung 等 (2008)。可免费用于筛查。
+- **AUDIT** — World Health Organization（Babor 等, 2001）。公共卫生筛查工具，可免费使用。
+- **FTND** — Heatherton 等 (1991)。研究与临床常用，请保留来源。
+- **UCLA-3** — Hughes 等 (2004)。可免费用于研究与临床。
+- **WSAS** — Mundt 等 (2002)。可免费用于研究与临床。
+- **SWLS** — Diener 等 (1985)。可免费用于研究与临床。
+- **K10** — Kessler 等 / World Health Organization。非商业使用请保留来源。
+- **EAT-26** — Garner 等 (1982)。临床与研究使用请保留来源；商业使用请先确认授权。
+- **PGSI** — Ferris & Wynne (2001)。非商业筛查可免费使用。
+- **CRAFFT** — Knight 等 (1999, 2002)。临床与研究使用请保留来源。
+- **DES-II** — Carlson & Putnam (1993)。临床与研究可免费使用并需保留来源；商业分发请先取得作者许可。
+- **ASQ** — NIMH / Horowitz 等 (2012)。可免费用于临床与研究筛查。
 
 ### 需要确认电子版/再分发条款的量表
 
@@ -48,6 +61,37 @@
 - **Rosenberg Self-Esteem Scale** — Morris Rosenberg（1965）
 - **AQ-10** — Allison, Auyeung & Baron-Cohen（2012）
 - **ITQ** — Cloitre 等 / International Trauma Consortium
+- **HADS** — Zigmond & Snaith（1983）；明确受版权保护，电子化再分发须取得授权。宗氏 SAS / SDS、AIS、ESS、AD8、FTND、MSPSS 的中文译本授权情况见下节。
+
+### 新增：国内医院常用量表（10 个，2026-11-17）
+
+新增文件 `app/src/main/java/com/mindtrace/app/data/HospitalScales.kt`。下列量表均给出原始文献、国内通行译本依据与可核对链接；应用内每个结果页也会显示来源与使用边界。中文条目采用国内公开教材 / 手册中的通行表述，若与授权版本不一致，以原作者发布的正式版本为准。
+
+| 量表 | 原始文献（可核对链接见应用内「结果页 → 来源」） | 授权边界 |
+| --- | --- | --- |
+| 宗氏焦虑自评量表 SAS | Zung WWK (1971), *Psychosomatics* 12(6): 371–379；中文条目与标准分换算见汪向东等《心理卫生评定量表手册》（1999 增订版） | 中文译本授权请自行确认；正式或电子化再分发前逐项核对 |
+| 宗氏抑郁自评量表 SDS | Zung WWK (1965), *Archives of General Psychiatry* 12: 63–70；同上手册 | 同上 |
+| 医院焦虑抑郁量表 HADS | Zigmond AS & Snaith RP (1983), *Acta Psychiatrica Scandinavica* 67(6): 361–370 | **受版权保护**，正式 / 电子化使用须取得授权 |
+| 老年抑郁量表 GDS-15 | Sheikh JI & Yesavage JA (1986), *Clinical Gerontologist* 5(1–2): 165–173；原始量表 Yesavage 等 (1983) | 作者声明可免费用于临床与研究，需注明出处 |
+| 阿森斯失眠量表 AIS | Soldatos CR 等 (2000), *Journal of Psychosomatic Research* 48(6): 555–560 | 中文译本授权请自行确认 |
+| Epworth 嗜睡量表 ESS | Johns MW (1991), *Sleep* 14(6): 540–545 | 作者允许注明出处后免费用于临床与研究 |
+| AD8 认知筛查 | Galvin JE 等 (2005), *Neurology* 65(4): 559–564 | 由知情者填写的筛查问卷；使用条款请按发布方说明核对 |
+| CAGE 酒精筛查 | Ewing JA (1984), *JAMA* 252(14): 1905–1907 | 公共领域 |
+| 尼古丁依赖检验量表 FTND | Heatherton TF 等 (1991), *British Journal of Addiction* 86(9): 1119–1127；国内戒烟门诊译本见《中国临床戒烟指南》 | 中文译本授权请自行确认 |
+| 领悟社会支持量表 MSPSS | Zimet GD 等 (1988), *Journal of Personality Assessment* 52(1): 30–41；中文译本（姜乾金等）见《心理卫生评定量表手册》 | 可免费用于非商业研究；商业使用请确认 |
+
+应用内的适配与简化（均已写入各量表的使用边界说明）：
+
+- **SAS / SDS**：20 题各 1–4 分，5 / 10 道正向表述题反向计分，按标准分 = 粗分 × 1.25 判读；国内常用界值分别为 50 / 53 分。SDS 第 19 题涉及活着是否有意义，回答偏重时提供紧急支持入口。
+- **HADS**：14 题各 0–3 分，6 道正向表述题反向计分；为便于手机端逐题作答，选项统一为四级频率（原版每题选项措辞不同），结果页另给焦虑 / 抑郁两个 0–21 分量表分数。
+- **AIS**：8 题各 0–3 分，选项统一为四级程度（原版各题措辞略有不同），界值 6 分。
+- **GDS-15 / AD8 / CAGE**：使用「是 / 否」二分类，正向题反向计分或按原题方向计分。
+- **FTND**：各题按原量表权重计分（0–10），不是简单求和。
+- **MSPSS**：12 题各 1–7 分（12–84），按总分映射为低 / 中 / 高支持感。
+
+未纳入 SCL-90、HAMD / HAMA、MMSE / MoCA、PANSS、Y-BOCS 等：这些工具受版权保护或须由受训专业人员施测与评分，不适合放进本机自评问卷。
+- **MID-60（多维解离量表简版）** — Paul Dell 等。商业或电子版再分发需授权，**未内置**。
+- **SCL-90** — Derogatis / Pearson。属于商业授权量表，**未内置**（可用 K10、PHQ-15、DASS-21 等免费工具替代）。
 
 ### 简化版本说明
 

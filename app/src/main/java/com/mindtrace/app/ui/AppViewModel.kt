@@ -386,11 +386,6 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         refreshSettings()
     }
 
-    fun markSponsorPromptShown() {
-        settingsStore.sponsorPromptShown = true
-        refreshSettings()
-    }
-
     fun setCrisisCountry(code: String) {
         settingsStore.crisisCountry = code
         refreshSettings()
